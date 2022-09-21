@@ -4,10 +4,10 @@ const main = () =>{
     const gl = canvas.getContext('webgl');
 
     const vertices = [
-        0.5, 0.5, 1.0, 0.1, 1.0,
-        0.0, 0.0, 1.0, 0.0, 0.0,
-        -0.5, 0.5, 1.0, 1.0, 1.0,
-        0.0, 1.0, 1.0, 1.0, 0.0
+        0.5, 0.5, 0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 0.0, 1.0,
+        -0.5, 0.5, 1.0, 1.0, 0.0,
+        0.0, 1.0, 1.0, 1.0, 1.0
     ];
     
     const buffer = gl.createBuffer();
@@ -23,8 +23,8 @@ const main = () =>{
     uniform float uTheta;
     varying vec3 vColor;
     void main() {
-        float x = -sin(uTheta) * aPosition.y + cos(uTheta) * aPosition.y;
-        float y = cos(uTheta) * aPosition.x + sin(uTheta) * aPosition.x;
+        float x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
+        float y = cos(uTheta) * aPosition.x + sin(uTheta) * aPosition.y;
         
         gl_Position = vec4(x, y, 0.0, 1.0);
         vColor = aColor;
@@ -54,6 +54,7 @@ const main = () =>{
 
     // varoaible lokal
     var theta = 0.0;
+    var freeze = false;
 
     // variable pointer ke GLSL
     var uTheta = gl.getUniformLocation(shaderProgram, 'uTheta');
@@ -73,18 +74,28 @@ const main = () =>{
     );
     gl.enableVertexAttribArray(aColor);
 
+    // computer graphics 
+    const onMouseClick = (event) => {
+        freeze = !freeze;
+    }
+    document.addEventListener('click', onMouseClick);
+
     // main loop
     const render = () => {
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        theta += 0.01;
-        gl.uniform1f(uTheta, theta);
+
+        if(!freeze){
+            theta += -0.01;
+            gl.uniform1f(uTheta, theta);
+        }
+
         gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+
         requestAnimationFrame(render);
     }
 
-
-    setInterval(render, 1000/60);
+    requestAnimationFrame(render);
 
 
     // drawing
