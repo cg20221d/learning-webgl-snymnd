@@ -16,10 +16,20 @@
         const renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
+
+        
         const geometry = new THREE.BoxGeometry(1,2,3);
-        const material = new THREE.MeshBasicMaterial({ color: 0xc0ffee, wireframe: true,});
+        const material = new THREE.MeshPhongMaterial({ color: 0xc0ffee});
         const cube = new THREE.Mesh(geometry, material);
+        
+        const intensity = 1;
+        const light = new THREE.DirectionalLight(0xFFFFFF, intensity);
+        light.position.set(-1, 2, 4);
+        
+        
+        scene.add(light);
         scene.add(cube);
+        
         camera.position.z = 10;
         const animate =  () => {
             requestAnimationFrame(animate);
