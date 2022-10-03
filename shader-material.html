@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="./three.js"></script>
+
+
+    <script type="x-shader/x-vertex" id="vertexshader">
+		varying vec2 v_uv;
+		void main() {
+		   v_uv = uv;
+		   gl_Position = projectionMatrix * modelViewMatrix *    vec4(position, 1.0);
+		}
+	</script>
+	<script type="x-shader/x-fragment" id="fragmentshader">
+		varying vec2 v_uv;
+		uniform vec3 color;
+		void main() {
+			gl_FragColor = vec4(color, 1.0);
+		}
+	</script>
+
+
+    <script>
+        let camera, scene, renderer;
+			let geometry, sphere;
+			const numLat = 100;
+			const numLng = 200;
+			let numLinesCulled = 0;
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.z = 3.5;
+
+				addGeometry();
+			}
+
+			function addGeometry() {
+
+				geometry = new THREE.SphereGeometry(1, 64, 64);
+				const material = new THREE.MeshPhongMaterial({ color: 0xc0ffee, flatShading: true,});
+				
+				const shaderMaterial = new THREE.ShaderMaterial( {
+					uniforms: {
+						color: { value: new THREE.Color( 0xc0ffee ) }
+					},
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
+				} );
+				sphere = new THREE.LineSegments( geometry, shaderMaterial );
+				scene.add( sphere );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				const time = Date.now() * 0.001;
+
+				sphere.rotation.x = time * 0.25;
+				sphere.rotation.y = time * 0.5;
+
+				renderer.render( scene, camera );
+
+			}
+
+    </script>
+</body>
+</html>
