@@ -3,12 +3,9 @@ const main = () =>{
     const canvas = document.querySelector('#kanvas');
     const gl = canvas.getContext('webgl');
 
-    var x = 0.0;
-    var y = 0.0;
-
 
     const vertices = [
-        0.5 + x, 0.0 + y, 0.0, 1.0, 1.0,
+        0.5, 0.0, 0.0, 1.0, 1.0,
         0.0, -0.5, 1.0, 0.0, 1.0,
         -0.5, 0.0, 1.0, 1.0, 0.0,
         0.0, 0.5, 1.0, 1.0, 1.0
@@ -25,15 +22,28 @@ const main = () =>{
     attribute vec2 aPosition;
     attribute vec3 aColor;
     uniform float uTheta;
-    varying vec3 vColor;
     uniform vec2 uTranslate;
+    varying vec3 vColor;
     void main() {
-        float x = -sin(uTheta) *(aPosition.x)+ cos(uTheta) * (aPosition.y)  + uTranslate.x;
-        float y = cos(uTheta) * (aPosition.x) + sin(uTheta) * (aPosition.y) + uTranslate.y;
-        
-        gl_Position = vec4(x, y, 0.0, 1.0);
+        //float x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
+        //float y = cos(uTheta) * aPosition.x + sin(uTheta) * aPosition.y;
+        //gl_Position = vec4(x + uTranslate.x, y + uTranslate.y, 0.0, 1.0);
+
+        vec2 position = aPosition;
+        mat4 rotation = mat4(
+            cos(uTheta), -sin(uTheta), 0.0, 0.0,
+            sin(uTheta), cos(uTheta), 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        );
+        mat4 translation = mat4(1.0, 0.0, 0.0, 0.0,
+                                0.0, 1.0, 0.0, 0.0,
+                                0.0, 0.0, 1.0, 0.0,
+                                uTranslate.x, uTranslate.y, 0.0, 1.0);
+        gl_Position = translation * rotation * vec4(position, 0.0, 1.0);
         vColor = aColor;
     }`
+    ;
     const vertexShaderObject = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShaderObject, vertexShaderCode);
     gl.compileShader(vertexShaderObject); //sampai sini sudah menjadi .o
